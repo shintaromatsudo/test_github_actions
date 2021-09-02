@@ -1,0 +1,19 @@
+name: Auto Author Assign
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - ready_for_review
+
+jobs:
+  automate-project-columns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: add reviewers
+        uses: kentaro-m/auto-assign-action@v1.1.2
+        with:
+          configuration-path: '.github/config_auto_assign.yml'
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
