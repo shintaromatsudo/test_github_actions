@@ -18,6 +18,6 @@ jobs:
         shell: bash
         run: |
           hub push
-          hub pull-request -b develop -h main -m "main -> develop" -r shintaromatsudo
+          hub pull-request -b develop -h main -m "main -> develop" -r shintaromatsudo || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
