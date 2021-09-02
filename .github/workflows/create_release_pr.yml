@@ -13,14 +13,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@master
-
-      - name: echo-npm-version
-        id: echo-version
-        run: |
-          echo v${{ steps.package-version.outputs.current-version}}
       - name: Create a release pull request
         uses: bakunyo/git-pr-release-action@master
         env:
@@ -28,5 +20,4 @@ jobs:
           GIT_PR_RELEASE_BRANCH_PRODUCTION: release
           GIT_PR_RELEASE_BRANCH_STAGING: main
           GIT_PR_RELEASE_LABELS: release
-          NPM_VERSION: v${{ steps.package-version.outputs.current-version}}
           GIT_PR_RELEASE_TEMPLATE: .github/.git-pr-release-template
