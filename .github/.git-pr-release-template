@@ -1,4 +1,4 @@
 <%= ENV['TAG'] %>
 <% pull_requests.each do |pr| -%>
-<%=  pr.to_checklist_item %>
+<%=  "[##{pr.pr[:number]}](#{pr.html_link}) #{pr.pr[:title]}" %>
 <% end -%>
