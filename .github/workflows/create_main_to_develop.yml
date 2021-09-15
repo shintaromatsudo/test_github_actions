@@ -17,7 +17,6 @@ jobs:
       - name: Create PullRequest
         shell: bash
         run: |
-          hub push
-          hub pull-request -b develop -h main -m "main -> develop" -r shintaromatsudo || true
+          gh pr create --base develop --head main --title "main -> develop" --body ""
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
