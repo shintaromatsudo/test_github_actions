@@ -1,3 +1,4 @@
-change-template: '#$NUMBER $TITLE @$AUTHOR'
+name-template: 'Draft'
+change-template: '#$NUMBER $TITLE'
 template: |
   $CHANGES
