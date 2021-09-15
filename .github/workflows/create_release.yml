@@ -1,4 +1,4 @@
-name: Create Release
+name: Update Release Draft
 
 on:
   push:
@@ -6,22 +6,9 @@ on:
       - main
 
 jobs:
-  create-release:
+  update_release_draft:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      # - name: Get tag
-      #   id: tag
-      #   run: |
-      #     TAG=$(TODAY=v`date +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
-      #     echo ::set-output name=TAG::$TAG
-      #   env:
-      #     TZ: Asia/Tokyo
-
-      - name: Create or update a release
-        uses: release-drafter/release-drafter@v5
+      - uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
