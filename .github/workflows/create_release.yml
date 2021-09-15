@@ -24,4 +24,4 @@ jobs:
       - name: Create or update a release
         uses: release-drafter/release-drafter@v5
         env:
-          TAG: ${{ steps.tag.outputs.TAG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
