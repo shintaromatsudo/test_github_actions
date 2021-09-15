@@ -1,28 +1,27 @@
-name: Create Release
+name: Create Release Pull Request
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - release
+      - main
 
 jobs:
-  create-release:
+  create-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      # - name: Get tag
+      #   id: tag
+      #   run: |
+      #     TAG=$(TODAY=v`date +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
+      #     echo ::set-output name=TAG::$TAG
+      #   env:
+      #     TZ: Asia/Tokyo
+
+      - name: Create or update a release
+        uses: release-drafter/release-drafter@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.pull_request.title }}
-          release_name: ${{ github.event.pull_request.title }}
-          body: ${{ github.event.pull_request.body }}
-          draft: true
-          prerelease: false
+          TAG: ${{ steps.tag.outputs.TAG }}
