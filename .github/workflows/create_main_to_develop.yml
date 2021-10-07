@@ -17,6 +17,6 @@ jobs:
       - name: Create PullRequest
         shell: bash
         run: |
-          gh pr create --base develop --head main --title "main -> develop" --body "" -r shintaromatsudo || true
+          gh pr create --base develop --head main --title "main -> develop" --body "" --reviewer ${{ github.event.sender.login }},shintaro-matsudo || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
