@@ -17,8 +17,8 @@ jobs:
         id: tag
         run: |
           TAG=$(TODAY=v`date +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
-            echo ::set-output name=TAG::$TAG
-          env:
+          echo ::set-output name=TAG::$TAG
+        env:
             TZ: Asia/Tokyo
 
       - name: Create a release pull request
