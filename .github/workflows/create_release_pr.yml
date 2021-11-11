@@ -16,7 +16,7 @@ jobs:
       - name: Get today
         id: today
         run: |
-          TODAY=`date +"%Y%m%d"`
+          TODAY=$(date +'%Y%m%d')
           echo ::set-output name=TODAY::$TODAY
         env:
           TZ: Asia/Tokyo
