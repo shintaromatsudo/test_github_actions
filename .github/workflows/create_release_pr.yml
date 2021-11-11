@@ -28,5 +28,5 @@ jobs:
           GIT_PR_RELEASE_BRANCH_STAGING: main
           GIT_PR_RELEASE_LABELS: release
           GIT_PR_RELEASE_TEMPLATE: .github/.git-pr-release-template
-          TODAY: $(date '+%Y%m%d')
+          TODAY: echo $(date '+%Y%m%d')
           TZ: Asia/Tokyo
