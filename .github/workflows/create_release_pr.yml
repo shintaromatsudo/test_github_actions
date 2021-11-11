@@ -16,8 +16,9 @@ jobs:
       - name: Get today
         id: today
         run: |
-          TODAY=$(date +'%Y%m%d')
-          echo ::set-output name=TODAY::$TODAY
+          # TODAY=$(date +'%Y%m%d')
+          # echo ::set-output name=TODAY::$TODAY
+          echo "::set-env name=TODAY::v$(date '+%Y%m%d')"
         env:
           TZ: Asia/Tokyo
 
@@ -29,4 +30,4 @@ jobs:
           GIT_PR_RELEASE_BRANCH_STAGING: main
           GIT_PR_RELEASE_LABELS: release
           GIT_PR_RELEASE_TEMPLATE: .github/.git-pr-release-template
-          TODAY: ${{ steps.tag.outputs.TODAY }}
+          # TODAY: ${{ env.TODAY }}
