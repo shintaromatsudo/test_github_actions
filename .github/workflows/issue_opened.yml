@@ -1,0 +1,48 @@
+name: Issue_Opened
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  automate-project-columns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: to miitel-analytics
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: test
+          column: To do
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: to Account To do
+        if: github.event.label.name == 'MiiTel Account'
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: test
+          column: To do - Account
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: to Third party To do
+        if: github.event.label.name == 'thirdparty' || github.event.label.name == 'thirdparty_hubspot'
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: test
+          column:  To do - Third party
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: to Admin To do
+        if: github.event.label.name == 'MiiTel Admin'
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: test
+          column:  To do - Admin
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: to ASAP
+        if: github.event.label.name == format('Priority{0} Critical', ':') || github.event.label.name == format('Priority{0} High', ':')
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: test
+          column: ASAP
+          repo-token: ${{ secrets.PROJECT_TOKEN }}
