@@ -13,7 +13,7 @@ jobs:
         with:
           project: test
           column: To do
-          repo-token: ${{ secrets.PROJECT_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: to Account To do
         if: github.event.label.name == 'MiiTel Account'
@@ -21,7 +21,7 @@ jobs:
         with:
           project: test
           column: To do - Account
-          repo-token: ${{ secrets.PROJECT_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: to Third party To do
         if: github.event.label.name == 'thirdparty' || github.event.label.name == 'thirdparty_hubspot'
@@ -29,7 +29,7 @@ jobs:
         with:
           project: test
           column:  To do - Third party
-          repo-token: ${{ secrets.PROJECT_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: to Admin To do
         if: github.event.label.name == 'MiiTel Admin'
@@ -37,7 +37,7 @@ jobs:
         with:
           project: test
           column:  To do - Admin
-          repo-token: ${{ secrets.PROJECT_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: to ASAP
         if: github.event.label.name == format('Priority{0} Critical', ':') || github.event.label.name == format('Priority{0} High', ':')
@@ -45,4 +45,4 @@ jobs:
         with:
           project: test
           column: ASAP
-          repo-token: ${{ secrets.PROJECT_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
