@@ -1,0 +1,4 @@
+name-template: 'Draft'
+change-template: '#$NUMBER $TITLE'
+template: |
+  $CHANGES
