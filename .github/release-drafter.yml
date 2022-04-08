@@ -13,9 +13,9 @@ categories:
     - title: '🧰 Refactor'
       labels:
         - 'refactor'
-  - title: ' 🤖 Dependencies'
-    labels:
-      - 'dependencies'
+    - title: ' 🤖 Dependencies'
+      labels:
+        - 'dependencies'
 change-template: '- [] #$NUMBER $TITLE @$AUTHOR'
 template: |
   $CHANGES
