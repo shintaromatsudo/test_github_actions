@@ -13,12 +13,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Get today
-      #   id: today
-      #   run: |
-      #     echo "::set-output name=today::$(date '+%Y%m%d')"
-      #   env:
-      #     TZ: Asia/Tokyo
+      - name: Get today
+        id: today
+        run: |
+          echo "::set-output name=today::$(date '+%Y%m%d')"
+        env:
+          TZ: Asia/Tokyo
 
       - name: Create a release pull request
         uses: bakunyo/git-pr-release-action@master
@@ -28,5 +28,4 @@ jobs:
           GIT_PR_RELEASE_BRANCH_STAGING: main
           GIT_PR_RELEASE_LABELS: release
           GIT_PR_RELEASE_TEMPLATE: .github/.git-pr-release-template
-          TODAY: echo $(date '+%Y%m%d')
-          TZ: Asia/Tokyo
+          TODAY: ${{ steps.today.outputs.today }}
