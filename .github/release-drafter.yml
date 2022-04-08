@@ -16,6 +16,6 @@ categories:
     - title: ' 🤖 Dependencies'
       labels:
         - 'dependencies'
-change-template: '- [] #$NUMBER $TITLE @$AUTHOR'
+change-template: '- [ ] #$NUMBER $TITLE @$AUTHOR'
 template: |
   $CHANGES
