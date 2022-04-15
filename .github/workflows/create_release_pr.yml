@@ -24,4 +24,5 @@ jobs:
           TODAY: ${{ steps.today.outputs.today }}
         run: |
           gem install git-pr-release
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GIT_PR_RELEASE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git-pr-release || echo "Done."
