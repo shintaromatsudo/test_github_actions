@@ -8,24 +8,21 @@ on:
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
+    env:
+      GIT_PR_RELEASE_BRANCH_PRODUCTION: release
+      GIT_PR_RELEASE_BRANCH_STAGING: main
+      GIT_PR_RELEASE_LABELS: release
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Ruby 3.1
+        uses: ruby/setup-ruby@v1
         with:
-          fetch-depth: 0
-
-      - name: Get today
-        id: today
-        run: |
-          echo "::set-output name=today::$(date '+%Y%m%d')"
+          ruby-version: 3.1
+      - name: Execute git-pr-release
         env:
-          TZ: Asia/Tokyo
-
-      - name: Create a release pull request
-        uses: bakunyo/git-pr-release-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_PR_RELEASE_BRANCH_PRODUCTION: release
-          GIT_PR_RELEASE_BRANCH_STAGING: main
-          GIT_PR_RELEASE_LABELS: release
-          GIT_PR_RELEASE_TEMPLATE: .github/.git-pr-release-template
+          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_TEMPLATE: .github/pr-release-template
           TODAY: ${{ steps.today.outputs.today }}
+        run: |
+          gem install git-pr-release
+          git-pr-release || echo "Done."
