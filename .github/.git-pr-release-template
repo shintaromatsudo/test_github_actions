@@ -1,5 +1,4 @@
 RELEASE <%= ENV['TODAY'] %>
 <% pull_requests.each do |pr| -%>
-<%=  pr.to_checklist_item %>
-<%= pr.to_hash[:data][:title] %>
+<%= "- [ ] ##{pr.number} #{pr.title}" + mention %>
 <% end -%>
