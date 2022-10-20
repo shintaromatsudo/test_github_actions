@@ -1,6 +1,9 @@
 name: Execute staging release
 
 on:
+  push:
+    branches:
+      - main
   repository_dispatch:
     types: [staging_release]
 
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: release
 
       - name: Create tag
         id: create-tag
@@ -28,7 +33,7 @@ jobs:
       - name: Create and Merge PullRequest
         shell: bash
         run: |
-          gh pr create --base develop --head main --title "${{ steps.create-tag.outputs.tag }}" --body "" --reviewer ${{ github.event.sender.login }}
-          gh pr merge ${{ steps.cpr.outputs.pull-request-url }} --merge
+          gh pr create --base release --head main --title "test" --body "" --reviewer ${{ github.event.sender.login }}
+          gh pr merge main --merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
