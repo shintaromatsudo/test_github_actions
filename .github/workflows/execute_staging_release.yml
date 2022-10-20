@@ -18,16 +18,22 @@ jobs:
         with:
           ref: release
 
-      - name: Create tag
-        id: create-tag
+      - name: Create title
+        id: create-title
         run: |
-          TAG=`date +%Y%m%d`-${GITHUB_SHA::8}
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          TITLE=RELEASE`date +%Y%m%d`
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+
+      - name: Create body
+        id: create-body
+        run: |
+          BODY=${GITHUB_SHA::8}
+          echo "body=$BODY" >> $GITHUB_OUTPUT
 
       - name: Create and Merge PullRequest
         shell: bash
         run: |
-          gh pr create --base release --head main --title "${{ steps.create-tag.outputs.tag }}" --body "" --reviewer ${{ github.event.sender.login }}
+          gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body "${{ steps.create-body.outputs.body }}" --reviewer ${{ github.event.sender.login }}
           gh pr merge main --merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
