@@ -1,9 +1,6 @@
-name: Execute staging release
+name: Execute Staging Release
 
 on:
-  push:
-    branches:
-      - main
   repository_dispatch:
     types: [staging_release]
 
@@ -30,10 +27,16 @@ jobs:
           BODY=${GITHUB_SHA::8}
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
-      - name: Create and Merge PullRequest
+      - name: Create PullRequest
         shell: bash
         run: |
           gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body "${{ steps.create-body.outputs.body }}" --reviewer ${{ github.event.sender.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PullRequest
+        shell: bash
+        run: |
           gh pr merge main --merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
