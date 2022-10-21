@@ -1,0 +1,31 @@
+name: Execute main to develop
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_pull_request:
+    name: Execute main to develop
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: develop
+
+      - name: Create PullRequest
+        shell: bash
+        run: |
+          gh pr create --base develop --head main --title "main -> develop" --body "" --reviewer ${{ github.event.sender.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PullRequest
+        shell: bash
+        run: |
+          gh pr merge main --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
