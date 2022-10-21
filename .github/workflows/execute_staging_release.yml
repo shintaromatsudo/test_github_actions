@@ -1,0 +1,42 @@
+name: Execute Staging Release
+
+on:
+  repository_dispatch:
+    types: [staging_release]
+
+jobs:
+  execute_staging_release:
+    name: Execute staging release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: release
+
+      - name: Create title
+        id: create-title
+        run: |
+          TITLE=RELEASE`date +%Y%m%d`
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+
+      - name: Create body
+        id: create-body
+        run: |
+          BODY=${GITHUB_SHA::8}
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+
+      - name: Create PullRequest
+        shell: bash
+        run: |
+          gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body "${{ steps.create-body.outputs.body }}" --reviewer ${{ github.event.sender.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PullRequest
+        shell: bash
+        run: |
+          gh pr merge main --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
