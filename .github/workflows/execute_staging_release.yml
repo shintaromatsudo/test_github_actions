@@ -53,10 +53,6 @@ jobs:
         id: create-pr
         shell: bash
         run: |
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #'`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$",""); print $0; }'`
           PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
           echo "pr=$PR" >> $GITHUB_OUTPUT
         env:
@@ -69,11 +65,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     fetch-depth: 0
-
       - name: Draft release note
         shell: bash
         run: |
@@ -85,11 +76,11 @@ jobs:
       - name: Create body
         id: create-body
         run: |
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #'`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'`
-          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$",""); print $0; }'`
-          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
+          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$","\n"); print $0; }'`
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release}
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #'}
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'}
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$","\n"); print $0; }'}
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
       - name: Edit PullRequest
