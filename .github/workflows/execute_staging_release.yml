@@ -73,13 +73,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Create body
-      #   id: create-body
-      #   run: |
-      #     BODY=`git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
-      #     echo $BODY
-      #     echo "body=$BODY" >> $GITHUB_OUTPUT
-
       - name: Edit PullRequest
         shell: bash
         run: |
