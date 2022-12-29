@@ -23,7 +23,7 @@ jobs:
       - name: Create previous tag
         id: create-previous-tag
         run: |
-          echo $(git tag | tail -1)
+          echo $(git tag | tail -1 | echo -e $(cat))
           PTAG=$(git tag | tail -1)
           echo $PTAG
           echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
