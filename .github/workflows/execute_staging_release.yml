@@ -25,7 +25,6 @@ jobs:
         id: create-previous-tag
         run: |
           TAG=$(git tag | tail -1)
-          echo $TAG
           echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Create tag
