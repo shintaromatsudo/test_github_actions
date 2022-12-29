@@ -25,9 +25,13 @@ jobs:
       - name: Create previous tag
         id: create-previous-tag
         run: |
-          PTAG=$(git tag | tail -1)
-          echo $PTAG
-          echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
+          TAG=$(git tag | tail -1)
+          echo $TAG
+          echo `git log --merges --reverse  --format='%s' $TAG..release`
+          echo `git log --merges --reverse  --format='%s' $TAG..release | grep 'Merge pull request #'`
+          echo `git log --merges --reverse  --format='%s' $TAG..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'`
+          echo `git log --merges --reverse  --format='%s' $TAG..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$",""); print $0; }'`
+          echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Create tag
         id: create-tag
@@ -80,6 +84,10 @@ jobs:
       - name: Create body
         id: create-body
         run: |
+          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release`
+          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #'`
+          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'`
+          echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$",""); print $0; }'`
           BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
