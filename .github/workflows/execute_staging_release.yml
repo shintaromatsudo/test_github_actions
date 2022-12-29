@@ -1,36 +1,59 @@
-name: Execute Staging Release
+name: Merge main to release & Draft release note
 
 on:
   repository_dispatch:
-    types: [staging_release]
+    types: [release_preparation]
 
 jobs:
-  execute_staging_release:
-    name: Execute staging release
+  prepare_release:
+    name: Prepare release
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: release
+          fetch-depth: 0
 
       - name: Create title
         id: create-title
         run: |
-          TITLE=RELEASE`date +%Y%m%d`
+          TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
+          echo $TITLE
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
-      - name: Create body
-        id: create-body
+      - name: Create previous tag
+        id: create-previous-tag
         run: |
-          BODY=${GITHUB_SHA::8}
-          echo "body=$BODY" >> $GITHUB_OUTPUT
+          PTAG=$(git tag | tail -1)
+          echo $PTAG
+          echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        id: create-tag
+        run: |
+          D=$(( 3-$(TZ=UTC-9 date +%w) ))
+          if [ $D -lt 0 ]
+          then
+              D=$((6+$D))
+              echo $D
+          fi
+          echo $D
+          TAG=v$(TODAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
+          echo $TAG
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: release
 
       - name: Create PullRequest
+        id: create-pr
         shell: bash
         run: |
-          gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body "${{ steps.create-body.outputs.body }}" --reviewer ${{ github.event.sender.login }}
+          PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
+          echo "pr=$PR" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -38,5 +61,31 @@ jobs:
         shell: bash
         run: |
           gh pr merge main --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Draft release note
+        shell: bash
+        run: |
+          gh release delete ${{ steps.create-tag.outputs.tag }} -y
+          gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create body
+        id: create-body
+        run: |
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..${{ steps.create-tag.outputs.tag }} | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+
+      - name: Edit PullRequest
+        shell: bash
+        run: |
+          gh pr edit ${{ steps.create-pr.outputs.pr }} --body "${{ steps.create-body.outputs.body }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
