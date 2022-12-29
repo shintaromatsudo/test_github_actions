@@ -19,7 +19,6 @@ jobs:
         id: create-title
         run: |
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
-          echo $TITLE
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
       - name: Create previous tag
