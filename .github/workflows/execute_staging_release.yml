@@ -5,7 +5,7 @@ on:
     types: [release_preparation]
 
 jobs:
-  prepare_release:
+  merge_main_to_release:
     name: Merge main to release
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -41,6 +41,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  draft_release_note:
     name: Draft release note
     runs-on: ubuntu-latest
     timeout-minutes: 10
