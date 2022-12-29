@@ -80,7 +80,7 @@ jobs:
       - name: Create body
         id: create-body
         run: |
-          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..${{ steps.create-tag.outputs.tag }} | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
       - name: Edit PullRequest
