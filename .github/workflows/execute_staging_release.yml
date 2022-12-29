@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: release
 
       - name: Create title
         id: create-title
@@ -40,6 +38,11 @@ jobs:
         run: |
           BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..${{ steps.create-tag.outputs.tag }} | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
           echo "body=$BODY" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: release
 
       - name: Create PullRequest
         shell: bash
