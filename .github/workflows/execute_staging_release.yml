@@ -17,11 +17,13 @@ jobs:
         id: create-title
         run: |
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
+          echo $TITLE
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
       - name: Create previous tag
         id: create-previous-tag
         run: |
+          echo $(git tag | tail -1)
           PTAG=$(git tag | tail -1)
           echo $PTAG
           echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
