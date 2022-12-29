@@ -76,7 +76,7 @@ jobs:
       - name: Edit PullRequest
         shell: bash
         run: |
-          BODY=`git log --merges --reverse --format='%s' origin/main..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
