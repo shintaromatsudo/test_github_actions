@@ -23,8 +23,10 @@ jobs:
       - name: Create previous tag
         id: create-previous-tag
         run: |
-          echo $(echo git tag)
+          echo $(git tag | cat - <(echo "00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
+          echo $(git tag | echo $0)
           echo $(git tag | cat)
+          echo $(git tag | cat | echo $0)
           echo $(git tag | tail -1 | echo $0)
           PTAG=$(git tag | tail -1 | cat)
           echo $PTAG
