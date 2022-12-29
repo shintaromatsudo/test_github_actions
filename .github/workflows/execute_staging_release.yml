@@ -72,7 +72,7 @@ jobs:
       - name: Draft release note
         shell: bash
         run: |
-          gh release delete ${{ steps.create-tag.outputs.tag }} -y
+          gh release delete ${{ steps.create-tag.outputs.tag }} -y || true
           gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
