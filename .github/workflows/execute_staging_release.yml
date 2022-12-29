@@ -77,7 +77,7 @@ jobs:
         id: create-body
         run: |
           echo `git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'| awk '{ sub(" from.*$","\n"); print $0; }'`
-          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release}
+          BODY=`git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release`
           BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #'}
           BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g'}
           BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$","\n"); print $0; }'}
