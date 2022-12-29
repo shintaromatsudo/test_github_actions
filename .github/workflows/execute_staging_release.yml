@@ -84,6 +84,6 @@ jobs:
         shell: bash
         run: |
           BODY=`git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..release | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
-          gh pr edit ${{ steps.create-pr.outputs.pr }} --body $BPDY
+          gh pr edit ${{ steps.create-pr.outputs.pr }} --body $BODY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
