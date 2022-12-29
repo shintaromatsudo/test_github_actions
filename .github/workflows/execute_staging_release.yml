@@ -32,8 +32,14 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          echo $(date --help)
-          TAG=v$(TODAY=`TZ=UTC-9 date -v+wed +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
+          D=$(( 3-$(date +%w) ))
+          if [ $D -lt 0 ]
+          then
+              D=$((7+$D))
+              echo $D
+          fi
+          echo $D
+          TAG=v$(TODAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo $TAG
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
