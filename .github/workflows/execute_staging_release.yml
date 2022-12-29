@@ -5,8 +5,8 @@ on:
     types: [release_preparation]
 
 jobs:
-  merge_main_to_release:
-    name: Merge main to release
+  prepare_release:
+    name: Prepare release
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,9 +24,9 @@ jobs:
       - name: Create previous tag
         id: create-previous-tag
         run: |
-          TAG=$(git tag | tail -1)
-          echo $TAG
-          echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
+          PTAG=$(git tag | tail -1)
+          echo $PTAG
+          echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
 
       - name: Create tag
         id: create-tag
