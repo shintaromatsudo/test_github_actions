@@ -18,19 +18,14 @@ jobs:
       - name: Create title
         id: create-title
         run: |
-          TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
+          TITLE=RELEASE `TZ=UTC-9 date +%Y%m%d`
           echo $TITLE
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
       - name: Create previous tag
         id: create-previous-tag
         run: |
-          echo $(git tag | cat - <(echo "00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
-          echo $(git tag | echo $0)
-          echo $(git tag | cat)
-          echo $(git tag | cat | echo $0)
-          echo $(git tag | tail -1 | echo $0)
-          PTAG=$(git tag | tail -1 | cat)
+          PTAG=$(git tag | tail -1)
           echo $PTAG
           echo "previous_tag=$PTAG" >> $GITHUB_OUTPUT
 
