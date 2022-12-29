@@ -1,12 +1,12 @@
-name: Execute Staging Release
+name: Merge main to release & Draft release note
 
 on:
   repository_dispatch:
-    types: [staging_release]
+    types: [release_preparation]
 
 jobs:
-  execute_staging_release:
-    name: Execute staging release
+  prepare_release:
+    name: Merge main to release
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,7 +24,7 @@ jobs:
       - name: Create body
         id: create-body
         run: |
-          BODY=${GITHUB_SHA::8}
+          BODY=${git log --merges --reverse  --format='%s' v20221219_01..v20221221_01 | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
       - name: Create PullRequest
@@ -38,5 +38,31 @@ jobs:
         shell: bash
         run: |
           gh pr merge main --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    name: Draft release note
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create previous tag
+        id: create-previous-tag
+        run: |
+          TAG=$(git tag | tail -1)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        id: create-tag
+        run: |
+          TAG=v$(TODAY=`date +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Draft release note
+        shell: bash
+        run: |
+          gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title {{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag {{ steps.create-previous-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
