@@ -32,10 +32,10 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          D=$(( 3-$(date +%w) ))
+          D=$(( 3-$(TZ=UTC-9 date +%w) ))
           if [ $D -lt 0 ]
           then
-              D=$((7+$D))
+              D=$((6+$D))
               echo $D
           fi
           echo $D
@@ -43,21 +43,17 @@ jobs:
           echo $TAG
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Create body
-        id: create-body
-        run: |
-          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..${{ steps.create-tag.outputs.tag }} | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
-          echo "body=$BODY" >> $GITHUB_OUTPUT
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: release
 
       - name: Create PullRequest
+        id: create-pr
         shell: bash
         run: |
-          gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body "${{ steps.create-body.outputs.body }}" --reviewer ${{ github.event.sender.login }}
+          PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
+          echo "pr=$PR" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -76,6 +72,20 @@ jobs:
       - name: Draft release note
         shell: bash
         run: |
+          gh release delete ${{ steps.create-tag.outputs.tag }} -y
           gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create body
+        id: create-body
+        run: |
+          BODY=${git log --merges --reverse  --format='%s' ${{ steps.create-previous-tag.outputs.previous_tag }}..${{ steps.create-tag.outputs.tag }} | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'}
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+
+      - name: Edit PullRequest
+        shell: bash
+        run: |
+          gh pr edit ${{ steps.create-pr.outputs.pr }} --body "${{ steps.create-body.outputs.body }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
