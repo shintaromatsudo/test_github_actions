@@ -1,0 +1,32 @@
+name: Slack Incoming Webhooks
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Note
+        id: create-note
+        run: |
+          NOTE=`gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+          echo 'NOTE<<EOF' >> $GITHUB_ENV
+          echo $NOTE >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Slack Notification on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}"
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}

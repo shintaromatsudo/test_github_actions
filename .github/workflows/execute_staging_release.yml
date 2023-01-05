@@ -1,6 +1,8 @@
 name: Merge main to release & Draft release note
 
 on:
+  push:
+    branches: [ main ]
   repository_dispatch:
     types: [release_preparation]
 
@@ -41,15 +43,8 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          D=$(( 3-$(TZ=UTC-9 date +%w) ))
-          if [ $D -lt 0 ]
-          then
-              D=$((6+$D))
-              echo $D
-          fi
-          echo $D
-          TAG=v$(TODAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
-          echo $TAG
+          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
+          TAG=v$(git tag | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | cat - <(echo "${{ steps.create-next-wednesday.outputs.next_wednesday }}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Checkout
@@ -60,7 +55,6 @@ jobs:
 
       - name: Create PullRequest
         id: create-pr
-        shell: bash
         run: |
           PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
           echo "pr=$PR" >> $GITHUB_OUTPUT
@@ -68,14 +62,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge PullRequest
-        shell: bash
         run: |
           gh pr merge main --merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Draft release note
-        shell: bash
         run: |
           gh release delete ${{ steps.create-tag.outputs.tag }} -y || true
           gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
@@ -83,7 +75,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Edit PullRequest
-        shell: bash
         run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
