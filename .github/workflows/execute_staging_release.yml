@@ -49,6 +49,11 @@ jobs:
     timeout-minutes: 10
     needs: main_to_release
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       # Analyticsは基本水曜リリースなので、次の水曜日を取得する
       - name: Create next wednesday
         id: create-next-wednesday
