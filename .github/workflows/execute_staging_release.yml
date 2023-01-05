@@ -7,14 +7,14 @@ on:
     types: [release_preparation]
 
 jobs:
-  create_tag:
-    name: Prepare release
+  main_to_release:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          ref: release
           fetch-depth: 0
 
       - name: Create title
@@ -23,12 +23,38 @@ jobs:
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
+      - name: Create PullRequest
+        id: create-pr
+        run: |
+          PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
+          echo "pr=$PR" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PullRequest
+        run: |
+          gh pr merge main --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Edit PullRequest
+        run: |
+          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create previous tag
         id: create-previous-tag
         run: |
           TAG=$(git tag | tail -1)
           echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
 
+  draft_release_note:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: main_to_release
+    steps:
       # Analyticsは基本水曜リリースなので、次の水曜日を取得する
       - name: Create next wednesday
         id: create-next-wednesday
@@ -53,33 +79,6 @@ jobs:
         run: |
           TAG=v$(git tag | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | cat - <(echo "${{ steps.create-next-wednesday.outputs.next_wednesday }}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: release
-          fetch-depth: 0
-
-      - name: Create PullRequest
-        id: create-pr
-        run: |
-          PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
-          echo "pr=$PR" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Merge PullRequest
-        run: |
-          gh pr merge main --merge
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Edit PullRequest
-        run: |
-          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
-          gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Draft release note
         run: |
