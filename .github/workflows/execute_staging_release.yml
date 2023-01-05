@@ -41,11 +41,16 @@ jobs:
           NEXT_WEDNESDAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`
           echo "next_wednesday=$NEXT_WEDNESDAY" >> $GITHUB_OUTPUT
 
-      # 同じ日付でドラフトのリリースノートがある場合は削除して作り直す
+      # 同じ日付でドラフトのリリースノートがある場合は削除する
+      - name: Delete note
+        run: |
+          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create tag
         id: create-tag
         run: |
-          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
           TAG=v$(git tag | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | cat - <(echo "${{ steps.create-next-wednesday.outputs.next_wednesday }}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
