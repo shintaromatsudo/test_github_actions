@@ -43,7 +43,7 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete
+          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
           TAG=v$(git tag | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | cat - <(echo "${{ steps.create-next-wednesday.outputs.next_wednesday }}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
