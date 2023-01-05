@@ -28,13 +28,6 @@ jobs:
               "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}",
               "blocks": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}"
-                  }
-                },
-                {
                   "type": "context",
                   "elements": [
                     {
