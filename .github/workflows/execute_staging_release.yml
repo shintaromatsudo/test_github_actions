@@ -29,7 +29,7 @@ jobs:
           D=$(( 3-$(TZ=UTC-9 date +%w) ))
           if [ $D -lt 0 ]
           then
-              D=$((6+$D))
+              D=$((7+$D))
           fi
           NEXT_WEDNESDAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`
           echo "next_wednesday=$NEXT_WEDNESDAY" >> $GITHUB_OUTPUT
