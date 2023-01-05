@@ -26,17 +26,6 @@ jobs:
           payload: |
             {
               "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}",
-              "blocks": [
-                {
-                  "type": "context",
-                  "elements": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "<!channel|channel>"
-                    }
-                  ]
-                }
-              ]
             }
         env:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
