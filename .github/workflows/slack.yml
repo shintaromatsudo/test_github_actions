@@ -11,7 +11,6 @@ jobs:
 
       - name: Note
         id: create-note
-        shell: bash
         run: |
           NOTE=`gh release view v20230103_01 --json body  --jq .body`
           echo "note=$NOTE" >> $GITHUB_OUTPUT
