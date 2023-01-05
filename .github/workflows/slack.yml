@@ -12,9 +12,8 @@ jobs:
       - name: Note
         id: create-note
         run: |
-          NOTE=`gh release view v20230103_01 --json body  --jq .body`
           echo 'NOTE<<EOF' >> $GITHUB_ENV
-          curl $NOTE >> $GITHUB_ENV
+          gh release view v20230103_01 --json body  --jq .body >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
