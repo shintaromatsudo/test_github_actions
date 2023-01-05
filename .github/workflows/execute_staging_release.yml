@@ -41,16 +41,17 @@ jobs:
         run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
+          exit 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Slack Notification on Failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: danger
-          SLACK_MESSAGE: 'Failed to main_to_release'
-          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
+      # - name: Slack Notification on Failure
+      #   if: failure()
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_COLOR: danger
+      #     SLACK_MESSAGE: 'Failed to main_to_release'
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
 
   draft_release_note:
     runs-on: ubuntu-latest
@@ -96,7 +97,6 @@ jobs:
       - name: Draft release note
         run: |
           gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
-          exit 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
