@@ -45,13 +45,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Slack Notification on Failure
-      #   if: failure()
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_COLOR: danger
-      #     SLACK_MESSAGE: 'Failed to main_to_release'
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
+      - name: Slack Notification on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: danger
+          SLACK_MESSAGE: 'Failed to main_to_release'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
 
   draft_release_note:
     runs-on: ubuntu-latest
