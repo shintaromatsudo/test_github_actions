@@ -1,6 +1,8 @@
 name: Merge main to release & Draft release note
 
 on:
+  push:
+    branches: [ main ]
   repository_dispatch:
     types: [release_preparation]
 
@@ -21,6 +23,17 @@ jobs:
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
+      - name: Create next wednesday
+        id: create-next-wednesday
+        run: |
+          D=$(( 3-$(TZ=UTC-9 date +%w) ))
+          if [ $D -lt 0 ]
+          then
+              D=$((6+$D))
+          fi
+          NEXT_WEDNESDAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`
+          echo "next_wednesday=$NEXT_WEDNESDAY" >> $GITHUB_OUTPUT
+
       - name: Create previous tag
         id: create-previous-tag
         run: |
@@ -30,15 +43,8 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          D=$(( 3-$(TZ=UTC-9 date +%w) ))
-          if [ $D -lt 0 ]
-          then
-              D=$((6+$D))
-              echo $D
-          fi
-          echo $D
-          TAG=v$(TODAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`; git tag | grep -e ${TODAY} | cat - <(echo "${TODAY}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
-          echo $TAG
+          gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
+          TAG=v$(git tag | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | cat - <(echo "${{ steps.create-next-wednesday.outputs.next_wednesday }}_00") | sort | tail -1 | awk -F "_" "{cnt=\$2+1}{printf \"%s_%02d\", \$1, cnt}")
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Checkout
