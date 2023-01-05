@@ -49,7 +49,6 @@ jobs:
 
       - name: Create PullRequest
         id: create-pr
-        shell: bash
         run: |
           PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}`
           echo "pr=$PR" >> $GITHUB_OUTPUT
@@ -57,14 +56,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge PullRequest
-        shell: bash
         run: |
           gh pr merge main --merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Draft release note
-        shell: bash
         run: |
           gh release delete ${{ steps.create-tag.outputs.tag }} -y || true
           gh release create ${{ steps.create-tag.outputs.tag }} --draft --target release --title ${{ steps.create-tag.outputs.tag }} --generate-notes --notes-start-tag ${{ steps.create-previous-tag.outputs.previous_tag }}
@@ -72,7 +69,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Edit PullRequest
-        shell: bash
         run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           gh pr edit ${{ steps.create-pr.outputs.pr }} --body "$BODY"
