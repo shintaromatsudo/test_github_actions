@@ -9,6 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Note
+        id: create-note
+        shell: bash
+        run: |
+          NOTE=`gh release view v20230103_01`
+          echo "note=$NOTE" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Slack Notification on Success
         if: success()
         uses: slackapi/slack-github-action@v1.23.0
@@ -21,7 +30,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ steps.create-note.outputs.note }}"
                   }
                 },
                 {
@@ -29,7 +38,7 @@ jobs:
                   "elements": [
                     {
                       "type": "mrkdwn",
-                      "text": "Author: <https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>"
+                      "text": "<!channel|channel>"
                     }
                   ]
                 }
@@ -38,10 +47,3 @@ jobs:
         env:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
-
-      - name: Slack Notification on Success
-        if: failure()
-        uses: slackapi/slack-github-action@v1.23.0
-        env:
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_FAILURE }}
