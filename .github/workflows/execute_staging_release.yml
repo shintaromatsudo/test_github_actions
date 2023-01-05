@@ -21,6 +21,17 @@ jobs:
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
+      - name: Create next wednesday
+        id: create-next-wednesday
+        run: |
+          D=$(( 3-$(TZ=UTC-9 date +%w) ))
+          if [ $D -lt 0 ]
+          then
+              D=$((7+$D))
+          fi
+          NEXT_WEDNESDAY=`TZ=UTC-9 date -d "$D days" +%Y%m%d`
+          echo "next_wednesday=$NEXT_WEDNESDAY" >> $GITHUB_OUTPUT
+
       - name: Create previous tag
         id: create-previous-tag
         run: |
