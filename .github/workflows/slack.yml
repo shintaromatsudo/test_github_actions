@@ -25,7 +25,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}",
               "blocks": [
                 {
                   "type": "section",
