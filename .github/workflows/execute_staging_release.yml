@@ -44,12 +44,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create previous tag
-        id: create-previous-tag
-        run: |
-          TAG=$(git tag | tail -1)
-          echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
-
   draft_release_note:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -73,6 +67,12 @@ jobs:
           gh release list | grep -e ${{ steps.create-next-wednesday.outputs.next_wednesday }} | grep -e Draft | head -c 12 | xargs gh release delete || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create previous tag
+        id: create-previous-tag
+        run: |
+          TAG=$(git tag | tail -1)
+          echo "previous_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Create tag
         id: create-tag
