@@ -13,7 +13,9 @@ jobs:
         id: create-note
         run: |
           NOTE=`gh release view v20230103_01 --json body  --jq .body`
-          echo "note=$NOTE" >> $GITHUB_OUTPUT
+          echo 'NOTE<<EOF' >> $GITHUB_ENV
+          curl $NOTE >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,7 +31,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ steps.create-note.outputs.note }}"
+                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}"
                   }
                 },
                 {
