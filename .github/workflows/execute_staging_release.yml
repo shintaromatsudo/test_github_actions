@@ -23,7 +23,7 @@ jobs:
           TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
-       - name: Create next wednesday
+      - name: Create next wednesday
         id: create-next-wednesday
         run: |
           D=$(( 3-$(TZ=UTC-9 date +%w) ))
