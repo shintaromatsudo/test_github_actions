@@ -1,10 +1,10 @@
-name: Slack Incoming Webhooks
+name: Notify Slack
 on:
   push:
     branches: [ main ]
   pull_request:
 jobs:
-  build:
+  notify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ env.NOTE }}"
+              "text": "Analytics リリース\n\n${{ env.NOTE }}"
             }
         env:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
