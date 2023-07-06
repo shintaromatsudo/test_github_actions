@@ -25,7 +25,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Analytics リリース\n\n${{ env.NOTE }}"
+              "text": "Analytics Staging リリース\n\n${{ env.NOTE }}"
             }
         env:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
