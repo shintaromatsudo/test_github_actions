@@ -29,7 +29,7 @@ jobs:
         run: |
           PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}` || exit 0
           gh pr merge main --merge
-          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/\r\n-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           echo $BODY
           gh pr edit $PR --body "$BODY"
         env:
