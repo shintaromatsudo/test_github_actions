@@ -7,18 +7,18 @@ jobs:
   create:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: release
-          fetch-depth: 0
-
       - name: Generate token
         id: generate_token
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.ACTIONS_APP_ID }}
           private_key: ${{ secrets.ACTIONS_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: release
+          fetch-depth: 0
 
       - name: Create title
         id: create-title
@@ -39,12 +39,13 @@ jobs:
         id: body
         run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          echo $BODY
           echo "body=$BODY" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Create & Merge PullRequest
         run: |
-                  gh pr edit ${{ steps.pr.outputs.pr }} --body ${{ steps.body.outputs.body }}
+          gh pr edit ${{ steps.pr.outputs.pr }} --body ${{ steps.body.outputs.body }}
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
