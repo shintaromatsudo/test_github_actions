@@ -1,6 +1,8 @@
 name: Create Note Test
 on:
   workflow_dispatch:
+  push:
+    branches: main
 
 jobs:
   create:
@@ -26,26 +28,10 @@ jobs:
           echo "title=$TITLE" >> $GITHUB_OUTPUT
 
       - name: Create & Merge PullRequest
-        id: pr
         run: |
           PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}` || exit 0
           gh pr merge main --merge
-          echo "pr=$PR" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-
-      - name: Create & Merge PullRequest
-        id: body
-        run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/\r\n-/g' | awk '{ sub(" from.*$",""); print $0; }'`
-          echo 'body<<EOF' >> $GITHUB_OUTPUT
-          echo $BODY >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-
-      - name: Create & Merge PullRequest
-        run: |
-          gh pr edit ${{ steps.pr.outputs.pr }} --body "${{ steps.body.outputs.body }}"
+          gh pr edit $PR --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
