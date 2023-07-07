@@ -48,6 +48,6 @@ jobs:
 
       - name: Create & Merge PullRequest
         run: |
-          gh pr edit ${{ steps.pr.outputs.pr }} --body ${{ steps.body.outputs.body }}
+          gh pr edit ${{ steps.pr.outputs.pr }} --body "${{ steps.body.outputs.body }}"
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
