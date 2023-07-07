@@ -14,7 +14,8 @@ jobs:
         id: set-result
         with:
           script: |
-            return `gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+            PR=`gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+            return $PR
           result-encoding: string
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
