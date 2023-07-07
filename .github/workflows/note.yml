@@ -1,4 +1,4 @@
-name: Create Note
+name: Create Note Test
 on:
   workflow_dispatch:
 
@@ -37,7 +37,7 @@ jobs:
       - name: Create & Merge PullRequest
         id: body
         run: |
-          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/\r\n-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           echo 'body<<EOF' >> $GITHUB_OUTPUT
           echo $BODY >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
