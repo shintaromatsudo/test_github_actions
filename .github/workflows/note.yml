@@ -14,7 +14,7 @@ jobs:
         id: set-result
         with:
           script: |
-            const pr = `gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+            const pr = gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'
             console.log(pr)
             return pr
           result-encoding: string
