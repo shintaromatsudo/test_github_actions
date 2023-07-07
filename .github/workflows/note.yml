@@ -1,4 +1,4 @@
-name: Create Note
+name: Create Note Test
 on:
   workflow_dispatch:
 
