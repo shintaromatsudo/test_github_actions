@@ -1,23 +1,50 @@
-name: Notify Slack
+name: Create Note
 on:
   push:
     branches: [main]
   pull_request:
 jobs:
-  notify:
+  create:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Create Note
-        uses: actions/github-script@v6
-        id: set-result
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          script: |
-            return `gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
-          result-encoding: string
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ref: release
+          fetch-depth: 0
 
-      - name: Get result
-        run: echo "${{steps.set-result.outputs.result}}"
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.ACTIONS_APP_ID }}
+          private_key: ${{ secrets.ACTIONS_PRIVATE_KEY }}
+
+      - name: Create title
+        id: create-title
+        run: |
+          TITLE=RELEASE`TZ=UTC-9 date +%Y%m%d`
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+
+      - name: Create & Merge PullRequest
+        id: pr
+        run: |
+          PR=`gh pr create --base release --head main --title "${{ steps.create-title.outputs.title }}" --body '' --reviewer ${{ github.event.sender.login }}` || exit 0
+          gh pr merge main --merge
+          echo "pr=$PR" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - name: Create & Merge PullRequest
+        id: body
+        run: |
+          BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - name: Create & Merge PullRequest
+        run: |
+                  gh pr edit ${{ steps.pr.outputs.pr }} --body ${{ steps.body.outputs.body }}
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
