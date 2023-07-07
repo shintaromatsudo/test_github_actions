@@ -2,7 +2,7 @@ name: Create Note
 on:
   push:
     branches: [main]
-  pull_request:
+
 jobs:
   create:
     runs-on: ubuntu-latest
@@ -40,7 +40,9 @@ jobs:
         run: |
           BODY=`git log --merges --reverse --format='%s' release..origin/main | grep 'Merge pull request #' | sed -e 's/Merge pull request/-/g' | awk '{ sub(" from.*$",""); print $0; }'`
           echo $BODY
-          echo "body=$BODY" >> $GITHUB_OUTPUT
+          echo 'body<<EOF' >> $GITHUB_OUTPUT
+          echo $BODY >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
 
