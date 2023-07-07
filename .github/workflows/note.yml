@@ -4,7 +4,7 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  notify:
+  create:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,7 +16,7 @@ jobs:
           script: |
             const pr = `gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
             console.log(pr)
-            return $PR
+            return pr
           result-encoding: string
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
