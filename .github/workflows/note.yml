@@ -14,11 +14,11 @@ jobs:
           app_id: ${{ secrets.ACTIONS_APP_ID }}
           private_key: ${{ secrets.ACTIONS_PRIVATE_KEY }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: release
-          fetch-depth: 0
+      # - name: Checkout
+      #   uses: actions/checkout@v3
+      #   with:
+      #     ref: release
+      #     fetch-depth: 0
 
       - name: Create title
         id: create-title
