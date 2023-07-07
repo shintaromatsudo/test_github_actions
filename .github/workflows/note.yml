@@ -1,4 +1,4 @@
-name: Notify Slack
+name: Create Note
 on:
   push:
     branches: [main]
@@ -14,7 +14,8 @@ jobs:
         id: set-result
         with:
           script: |
-            PR=`gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+            const pr = `gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+            console.log(pr)
             return $PR
           result-encoding: string
         env:
