@@ -10,16 +10,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Create Note
-        uses: actions/github-script@v6
-        id: set-result
-        with:
-          script: |
-            const pr = gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'
-            console.log(pr)
-            return pr
-          result-encoding: string
+        id: result
+        run: |
+          PR=`gh release view v20230103_01 --json body --jq . | sed -e 's/{"body":"//g' | sed -e 's/"}//g'`
+          echo $PR
+          echo 'NOTE<<EOF' >> $GITHUB_OUTPUT
+          echo $PR >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get result
-        run: echo "${{steps.set-result.outputs.result}}"
+        run: echo "${{steps.result.outputs.NOTE}}"
