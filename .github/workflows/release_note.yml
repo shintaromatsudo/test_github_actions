@@ -20,9 +20,9 @@ jobs:
         release_url="${{ github.event.release.html_url }}"
         release_body=$(echo release_body | sed '/^<!--.*-->$/d')
         echo ${release_body}
-        release_body=${echo release_body//$'\r\n'/\\n}
+        release_body=${release_body//$'\r\n'/\\n}
         echo ${release_body}
-        release_body=${echo release_body//$'\n'/\\n}
+        release_body=${release_body//$'\n'/\\n}
         echo ${release_body}
         echo "release_body=${release_body}" >> $GITHUB_OUTPUT
         echo "release_url=${release_url}" >> $GITHUB_OUTPUT
