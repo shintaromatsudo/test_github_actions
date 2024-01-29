@@ -1,0 +1,38 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+    - published
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    if: github.event.release.target_commitish == 'main'
+    steps:
+    - id: get_release_note
+      name: get release note
+      run: |
+        release_body="${{ github.event.release.body }}"
+        echo ${release_body}
+        release_url="${{ github.event.release.html_url }}"
+        release_body=$(github.event.release.body | sed '/^<!--.*-->$/d' | sed '/\*\*Full Changelog\*\*/d')
+        echo ${release_body}
+        release_body=${release_body//$'\r\n'/\\n}
+        echo ${release_body}
+        release_body=${release_body//$'\n'/\\n}
+        echo ${release_body}
+        echo "release_body=${release_body}" >> $GITHUB_OUTPUT
+        echo "release_url=${release_url}" >> $GITHUB_OUTPUT
+    - name: Slack Notification
+      uses: slackapi/slack-github-action@v1.24.0
+      with:
+        payload: |
+          {
+            "text": "<!here> Announcement from *contacts v3* :tada:\n```${{ steps.get_release_note.outputs.release_body }}```\nReleases URL.\n${{ steps.get_release_note.outputs.release_url }}"
+          }
+      env:
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_SUCCESS }}
