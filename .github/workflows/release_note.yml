@@ -24,7 +24,9 @@ jobs:
         echo ${release_body}
         release_body=${release_body//$'\n'/\\n}
         echo ${release_body}
-        echo "release_body=${release_body}" >> $GITHUB_OUTPUT
+        echo 'release_body<<EOF' >> $GITHUB_OUTPUT
+        echo $release_body >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
         echo "release_url=${release_url}" >> $GITHUB_OUTPUT
     - name: Slack Notification
       uses: slackapi/slack-github-action@v1.24.0
